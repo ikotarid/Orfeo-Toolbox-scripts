@@ -6,9 +6,10 @@ app.SetParameterString("transform.type","id")
 app.SetParameterFloat("transform.type.id.scalex", 2.0)
 app.SetParameterFloat("transform.type.id.scaley", 2.0)
 app.SetParameterString("interpolator","nn")
+app.SetParameterOutputImagePixelType("out", 2) # Uint16
 app.ExecuteAndWriteOutput()
 
-#2. Crop bands to AOI
+#2a. Crop bands to AOI
 app = otbApplication.Registry.CreateApplication("ExtractROI")
 app.SetParameterString("in", "Path of input image")
 app.SetParameterString("mode","fit")
@@ -16,10 +17,24 @@ app.SetParameterFloat("mode.fit.vect", "Path of vector file")
 app.SetParameterString("out", "Path of output image")
 app.ExecuteAndWriteOutput()
 
+#2b. Crop bands to lower-left XY and upper-right XY! UTM PROJ
+app = otbApplication.Registry.CreateApplication("ExtractROI")
+app.SetParameterString("in", "Path of input image")
+app.SetParameterString("mode","extent")
+app.SetParameterFloat("mode.extent.ulx", 550966)
+app.SetParameterFloat("mode.extent.uly", 4490113)
+app.SetParameterFloat("mode.extent.lrx", 558523)
+app.SetParameterFloat("mode.extent.lry", 4499870)
+app.SetParameterString("mode.extent.unit", "lonlat")
+app.SetParameterString("out", "Path of output image")
+app.SetParameterOutputImagePixelType("out", 2) # Uint16
+app.ExecuteAndWriteOutput()
+
 #3. Stack bands
 app = otbApplication.Registry.CreateApplication("ConcatenateImages")
 app.SetParameterStringList("il", ['image_1','image_2',...,'image_n'])
 app.SetParameterString("out",r"Path of output image")
+app.SetParameterOutputImagePixelType("out", 2) # Uint16
 app.ExecuteAndWriteOutput()
 
 # 4. Segmentation: Performs segmentation of an image, and outputs a vector file.
@@ -28,6 +43,9 @@ app.SetParameterString("in", "image file")
 app.SetParameterString("mode","vector")
 app.SetParameterString("mode.vector.out", "Output vector file")
 app.SetParameterString("filter","Segmentation algorithm")
+
+#set algorithm parameters
+
 app.SetParameterString("mode.vector.neighbor", "true")
 app.ExecuteAndWriteOutput()
 
